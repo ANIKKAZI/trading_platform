@@ -49,65 +49,69 @@ if st.sidebar.button("⚡ Execute Quant Pipeline", use_container_width=True):
             with col_left:
                 st.subheader("🏆 Strategy Leaderboard")
 
-                # Check if your output structure has ranked results, fallback to dummy dataframe parsing if custom structured
-                if "ranked_results" in output:
-                    df_rank = pd.DataFrame(output["ranked_results"])
-                else:
-                    # Fallback structural parser if output dict is structured differently
-                    st.warning("Ensure build_json_output() matches schema expected below.")
-                    df_rank = pd.DataFrame()
-
-                # Mock preview table representation if dataframe parsing succeeded
-                if not df_rank.empty:
+                # Parse ranked results from output
+                if "top_10_stocks" in output and output["top_10_stocks"]:
+                    df_rank = pd.DataFrame(output["top_10_stocks"])
+                    df_rank.insert(0, "rank", range(1, len(df_rank) + 1))
                     st.dataframe(
-                        df_rank[["rank", "symbol", "composite_score"]],
+                        df_rank[["rank", "symbol", "score"]],
                         use_container_width=True,
                         hide_index=True
                     )
                 else:
-                    # Quick visual fallback UI so the application runs out-of-the-box
-                    mock_data = {"Rank": list(range(1, top_n + 1)),
-                                 "Symbol": ["AAPL", "NVDA", "MSFT", "TSLA"] + ["STK"] * (top_n - 4),
-                                 "Score": np.linspace(88, 62, top_n).round(2)}
-                    df_rank = pd.DataFrame(mock_data)
-                    st.dataframe(df_rank, use_container_width=True, hide_index=True)
+                    st.warning("No ranked results available. Check data fetching.")
+                    df_rank = pd.DataFrame()
 
             with col_right:
                 st.subheader("📈 Technical Chart Profile & S/R Zones")
-                selected_symbol = st.selectbox("Select Ticker to Chart", df_rank.iloc[:, 1].unique())
+                
+                if not df_rank.empty:
+                    selected_symbol = st.selectbox("Select Ticker to Chart", df_rank["symbol"].unique())
+                    
+                    # Get S/R data for selected symbol
+                    symbol_data = df_rank[df_rank["symbol"] == selected_symbol].iloc[0] if len(df_rank) > 0 else None
+                    support = symbol_data.get("support", []) if symbol_data is not None else []
+                    resistance = symbol_data.get("resistance", []) if symbol_data is not None else []
+                else:
+                    st.info("Run the pipeline to generate charts.")
+                    selected_symbol = None
 
-                # --- Visualizing S/R Zones & Historical Trends using Plotly ---
-                # Generating interactive chart layout
-                fig = go.Figure()
+                if selected_symbol:
+                    # --- Visualizing S/R Zones & Historical Trends using Plotly ---
+                    # Generating interactive chart layout
+                    fig = go.Figure()
 
-                # Simulated Candlestick timeline framework for visual representation
-                dates = pd.date_range(end=pd.Timestamp.now(), periods=60, freq='D')
-                np.random.seed(42)
-                price = 150 + np.cumsum(np.random.randn(60) * 2)
+                    # Simulated Candlestick timeline framework for visual representation
+                    dates = pd.date_range(end=pd.Timestamp.now(), periods=60, freq='D')
+                    np.random.seed(42)
+                    price = 150 + np.cumsum(np.random.randn(60) * 2)
 
-                fig.add_trace(go.Candlestick(
-                    x=dates,
-                    open=price - 1, high=price + 2,
-                    low=price - 2, close=price,
-                    name=selected_symbol
-                ))
+                    fig.add_trace(go.Candlestick(
+                        x=dates,
+                        open=price - 1, high=price + 2,
+                        low=price - 2, close=price,
+                        name=selected_symbol
+                    ))
 
-                # Visualizing Horizontal Support / Resistance levels
-                # In your production code, extract these from output['symbol_results'][selected_symbol]['sr_zones']
-                fig.add_shape(type="line", x0=dates[0], y0=max(price) + 3, x1=dates[-1], y1=max(price) + 3,
-                              line=dict(color="crimson", width=2, dash="dash"), name="Resistance Zone")
-                fig.add_shape(type="line", x0=dates[0], y0=min(price) - 3, x1=dates[-1], y1=min(price) - 3,
-                              line=dict(color="royalblue", width=2, dash="dash"), name="Support Zone")
+                    # Visualizing Horizontal Support / Resistance levels
+                    if resistance:
+                        resistance_level = resistance[0] if isinstance(resistance, list) else resistance
+                        fig.add_shape(type="line", x0=dates[0], y0=resistance_level, x1=dates[-1], y1=resistance_level,
+                                      line=dict(color="crimson", width=2, dash="dash"))
+                    if support:
+                        support_level = support[0] if isinstance(support, list) else support
+                        fig.add_shape(type="line", x0=dates[0], y0=support_level, x1=dates[-1], y1=support_level,
+                                      line=dict(color="royalblue", width=2, dash="dash"))
 
-                fig.update_layout(
-                    title=f"{selected_symbol} Price Chart with Automated S/R Overlays",
-                    yaxis_title="Price ($)",
-                    xaxis_title="Date",
-                    xaxis_rangeslider_visible=False,
-                    template="plotly_dark",
-                    height=450
-                )
-                st.plotly_chart(fig, use_container_width=True)
+                    fig.update_layout(
+                        title=f"{selected_symbol} Price Chart with Automated S/R Overlays",
+                        yaxis_title="Price ($)",
+                        xaxis_title="Date",
+                        xaxis_rangeslider_visible=False,
+                        template="plotly_dark",
+                        height=450
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
 
         except Exception as e:
             st.error(f"Engine Exception Encountered: {e}")

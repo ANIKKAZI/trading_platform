@@ -75,6 +75,22 @@
       "momentum_score": 100.0
     },
     {
+      "symbol": "GOOGL",
+      "score": 48.58,
+      "signal": "BUY",
+      "support": [
+        294.08,
+        296.04
+      ],
+      "resistance": [],
+      "strategies_triggered": [
+        "MomentumStrategy"
+      ],
+      "prediction": null,
+      "strategy_score": 27.0,
+      "momentum_score": 80.0
+    },
+    {
       "symbol": "TSLA",
       "score": 48.58,
       "signal": "BUY",
@@ -86,22 +102,6 @@
         470.75,
         474.07
       ],
-      "strategies_triggered": [
-        "MomentumStrategy"
-      ],
-      "prediction": null,
-      "strategy_score": 27.0,
-      "momentum_score": 80.0
-    },
-    {
-      "symbol": "GOOGL",
-      "score": 48.58,
-      "signal": "BUY",
-      "support": [
-        294.08,
-        296.04
-      ],
-      "resistance": [],
       "strategies_triggered": [
         "MomentumStrategy"
       ],
