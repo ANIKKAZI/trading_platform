@@ -1,6 +1,6 @@
 # Quantitative Stock Intelligence Platform
 
-A production-grade, modular quantitative trading intelligence system. Analyses 5+ years of historical stock data, computes 30+ technical indicators, detects support/resistance zones, runs four pluggable strategy modules, applies an optional ML layer, and outputs a daily ranked Top-N watchlist with explainable signals — all accessible through a unified visual dashboard, a standalone comparison interface, and a headless CLI.
+A production-grade, modular quantitative trading intelligence system. Analyses 5+ years of historical stock data, computes 30+ technical indicators, detects support/resistance zones, runs four pluggable strategy modules, trains and applies an XGBoost ML prediction layer via a built-in UI trainer, and outputs a daily ranked Top-N watchlist with explainable signals ï¿½ all accessible through a unified visual dashboard, a standalone comparison interface, and a headless CLI.
 
 ---
 
@@ -29,44 +29,44 @@ trading_model/
 +-- main.py                          # CLI entry point for daily pipeline
 +-- orchestrator.py                  # Full pipeline orchestrator
 +-- requirements.txt
-¦
+ï¿½
 +-- config/
-¦   +-- settings.py                  # All tunable parameters
-¦   +-- app.py                       # Original scanner-only Streamlit app
-¦
+ï¿½   +-- settings.py                  # All tunable parameters
+ï¿½   +-- app.py                       # Original scanner-only Streamlit app
+ï¿½
 +-- core/
-¦   +-- data_engine.py               # OHLCV fetching + parquet cache
-¦   +-- feature_engine.py            # 30+ technical indicators
-¦   +-- sr_engine.py                 # Support & resistance zone detection
-¦   +-- universe.py                  # Symbol universe loader
-¦
+ï¿½   +-- data_engine.py               # OHLCV fetching + parquet cache
+ï¿½   +-- feature_engine.py            # 30+ technical indicators
+ï¿½   +-- sr_engine.py                 # Support & resistance zone detection
+ï¿½   +-- universe.py                  # Symbol universe loader
+ï¿½
 +-- strategies/
-¦   +-- base_strategy.py             # Abstract base class
-¦   +-- momentum_strategy.py         # EMA alignment + multi-period momentum
-¦   +-- mean_reversion_strategy.py   # RSI + Bollinger Band reversion
-¦   +-- breakout_strategy.py         # Resistance breakout + volume confirm
-¦   +-- volatility_strategy.py       # ATR expansion + BB squeeze
-¦
+ï¿½   +-- base_strategy.py             # Abstract base class
+ï¿½   +-- momentum_strategy.py         # EMA alignment + multi-period momentum
+ï¿½   +-- mean_reversion_strategy.py   # RSI + Bollinger Band reversion
+ï¿½   +-- breakout_strategy.py         # Resistance breakout + volume confirm
+ï¿½   +-- volatility_strategy.py       # ATR expansion + BB squeeze
+ï¿½
 +-- engine/
-¦   +-- strategy_manager.py          # Plugin registry + weighted aggregation
-¦   +-- ranking_engine.py            # Composite scoring + Top-N selection
-¦   +-- ml_engine.py                 # Rule-based (Phase 1) + XGBoost (Phase 2)
-¦   +-- insight_engine.py            # Human-readable explanation generator
-¦   +-- output_formatter.py          # JSON serialization + file output
-¦   +-- market_context_engine.py     # Beta, correlation, sector, SPY trend
-¦   +-- scenario_engine.py           # Bull / Base / Bear probabilistic scenarios
-¦   +-- forecast_engine.py           # Full forecast orchestrator
-¦   +-- comparison_engine.py         # Side-by-side stock scoring + winner
-¦
+ï¿½   +-- strategy_manager.py          # Plugin registry + weighted aggregation
+ï¿½   +-- ranking_engine.py            # Composite scoring + Top-N selection
+ï¿½   +-- ml_engine.py                 # Rule-based (Phase 1) + XGBoost (Phase 2)
+ï¿½   +-- insight_engine.py            # Human-readable explanation generator
+ï¿½   +-- output_formatter.py          # JSON serialization + file output
+ï¿½   +-- market_context_engine.py     # Beta, correlation, sector, SPY trend
+ï¿½   +-- scenario_engine.py           # Bull / Base / Bear probabilistic scenarios
+ï¿½   +-- forecast_engine.py           # Full forecast orchestrator
+ï¿½   +-- comparison_engine.py         # Side-by-side stock scoring + winner
+ï¿½
 +-- interfaces/
-¦   +-- compare_interface.py         # Programmatic comparison entry point
-¦
+ï¿½   +-- compare_interface.py         # Programmatic comparison entry point
+ï¿½
 +-- ui/
-¦   +-- app.py                       # Unified dashboard (both tabs in one app)
-¦   +-- compare_dashboard.py         # Comparison-only Streamlit dashboard
-¦
+ï¿½   +-- app.py                       # Unified dashboard (both tabs in one app)
+ï¿½   +-- compare_dashboard.py         # Comparison-only Streamlit dashboard
+ï¿½
 +-- data/
-¦   +-- cache/                       # Parquet price cache (auto-created)
+ï¿½   +-- cache/                       # Parquet price cache (auto-created)
 +-- output/                          # Daily JSON results (auto-created)
 +-- models/                          # XGBoost model files (optional)
 ```
@@ -137,7 +137,7 @@ streamlit run ui/compare_dashboard.py
 
 ---
 
-### CLI — Daily Pipeline
+### CLI ï¿½ Daily Pipeline
 
 ```bash
 # Default custom universe (defined in settings.py)
@@ -158,7 +158,7 @@ python main.py --log-level DEBUG    # Verbose logging
 
 ---
 
-### CLI — Stock Comparison
+### CLI ï¿½ Stock Comparison
 
 ```bash
 # Basic comparison (defaults to 5-month horizon)
@@ -179,24 +179,37 @@ Results are printed to the console and saved to `output/comparison_results_YYYY-
 ---
 
 ## Interface Guide
+### ML Settings (sidebar â€” global)
 
+The very top of the sidebar applies to all three tabs:
+
+| Control | Description |
+|---|---|
+| Enable ML Predictions (toggle) | **ON** â†’ uses the trained XGBoost model for signal scoring; **OFF** â†’ rule-based scoring only |
+
+Status indicators:
+- `âœ… ML model active` â€” model file found and toggle is ON
+- `âš ï¸ No model yet` â€” toggle ON but no model trained yet; go to **ML Training** tab
+- `â„¹ï¸ Rule-based scoring active` â€” toggle OFF
+
+---
 ### Daily Scanner Tab
 
 **Sidebar controls:**
 
 | Control | Description |
 |---|---|
-| Universe Selection | `sp500` — full S&P 500; `custom` — symbols from `settings.py`; or comma-separated tickers |
-| Top Ranked Stocks | Slider 3–20, controls how many results to return |
+| Universe Selection | `sp500` ï¿½ full S&P 500; `custom` ï¿½ symbols from `settings.py`; or comma-separated tickers |
+| Top Ranked Stocks | Slider 3ï¿½20, controls how many results to return |
 | Force Data Refresh (Scanner) | Re-downloads price data even if cache exists |
 | Execute Quant Pipeline | Runs the full pipeline |
 
 **Main area:**
 
-- **Strategy Leaderboard** — ranked table of top-N stocks with composite score and signal label
-- **Technical Chart Profile** — interactive candlestick chart (3-month window) with Support & Resistance zones overlaid
-- **Ticker selector** — switch the chart to any stock in the leaderboard without re-running the pipeline
-- **Signal Details** — score, signal, strategy score, and momentum score for the selected stock
+- **Strategy Leaderboard** ï¿½ ranked table of top-N stocks with composite score and signal label
+- **Technical Chart Profile** ï¿½ interactive candlestick chart (3-month window) with Support & Resistance zones overlaid
+- **Ticker selector** ï¿½ switch the chart to any stock in the leaderboard without re-running the pipeline
+- **Signal Details** ï¿½ score, signal, strategy score, and momentum score for the selected stock
 
 ---
 
@@ -223,8 +236,8 @@ Results are printed to the console and saved to `output/comparison_results_YYYY-
 
 **After running:**
 
-- **Winner Banner** — which stock leads, confidence score, and active settings
-- **Metric Cards** (7 per stock) — Price, Base Return, Bull Case, Bear Case, Volatility, Signal, Confidence
+- **Winner Banner** ï¿½ which stock leads, confidence score, and active settings
+- **Metric Cards** (7 per stock) ï¿½ Price, Base Return, Bull Case, Bear Case, Volatility, Signal, Confidence
 - **Six chart tabs:**
 
 | Tab | Chart |
@@ -236,12 +249,45 @@ Results are printed to the console and saved to `output/comparison_results_YYYY-
 | Monthly Trend | Month-by-month price projection with +-1 sigma band and bull/bear bounds |
 | Distribution | Normal return distribution curves at the forecast horizon |
 
-- **Key Factors** — top differentiating factors from the comparison engine
-- **Signal Intelligence** — colour-coded badge chips for each strategy signal, trend direction, and risk flags
-- **Full Comparison Scorecard** — expandable metric-by-metric breakdown
+- **Key Factors** ï¿½ top differentiating factors from the comparison engine
+- **Signal Intelligence** ï¿½ colour-coded badge chips for each strategy signal, trend direction, and risk flags
+- **Full Comparison Scorecard** ï¿½ expandable metric-by-metric breakdown
 
 ---
+### ML Training Tab
 
+Access via the **ðŸ¤– ML Training** tab in the unified dashboard.
+
+**Model status panel** (top of tab):
+
+| Field | Description |
+|---|---|
+| Model Status | âœ… Trained / âŒ Not Trained |
+| Last Trained | Timestamp of last `models/xgb_model.pkl` write |
+| Model Size | File size in KB |
+
+**Training controls:**
+
+| Control | Description |
+|---|---|
+| Training Symbols | Comma-separated tickers to train on (defaults to `CUSTOM_SYMBOLS` from `settings.py`) |
+| Label Horizon | 5â€“60 trading days ahead used to create the binary up/down label (default 20d â‰ˆ 1 month) |
+| Force Data Refresh | Re-downloads price data before training |
+| Train Model | Fetches data â†’ computes features â†’ trains â†’ saves model |
+
+**After training:**
+
+- Metrics row: model type, accuracy %, train samples, test samples, symbols used
+- Accuracy guide: **> 60%** strong edge Â· **55â€“60%** modest edge Â· **< 55%** near random
+- Feature importance bar chart (horizontal, sorted by impact)
+- Model saved automatically to `models/xgb_model.pkl`
+- ML toggle in sidebar activates immediately for subsequent pipeline runs
+
+**Accuracy guidance:**
+
+Use **Force Data Refresh** + re-run the scanner or comparison after training a new model to ensure the latest model is used (the Streamlit cache is keyed by the ML toggle state).
+
+---
 ## Pipeline Architecture
 
 ### Daily Scanner Pipeline
@@ -327,15 +373,15 @@ Computes 30+ features per row:
 - Returns `SRZones` with `support` and `resistance` as lists of (lo, hi) tuples
 
 ### universe.py
-- `"sp500"` — scrapes current S&P 500 constituents from Wikipedia
-- `"custom"` — uses `CUSTOM_SYMBOLS` from `settings.py`
-- Any comma-separated string — treated as an ad-hoc ticker list
+- `"sp500"` ï¿½ scrapes current S&P 500 constituents from Wikipedia
+- `"custom"` ï¿½ uses `CUSTOM_SYMBOLS` from `settings.py`
+- Any comma-separated string ï¿½ treated as an ad-hoc ticker list
 
 ---
 
 ## Strategy Modules
 
-Each strategy returns a signal (`+1` buy / `0` neutral / `-1` sell) and a confidence score (0.0–1.0).
+Each strategy returns a signal (`+1` buy / `0` neutral / `-1` sell) and a confidence score (0.0ï¿½1.0).
 
 | Strategy | Weight | Logic |
 |---|---|---|
@@ -366,12 +412,12 @@ final_score = sum(signal x confidence x weight) / sum(weights) x 100
 
 ### market_context_engine.py
 Builds macro context for a symbol:
-- `beta` — relative movement vs SPY benchmark
-- `volatility` — annualised historical volatility
-- `spy_correlation` — Pearson correlation of daily returns with SPY
-- `spy_trend` — bullish / bearish / neutral based on SPY EMA 20/50 cross
-- `trend_direction` — strong_uptrend / uptrend / mixed / downtrend / strong_downtrend
-- `sector` — mapped from built-in sector lookup table
+- `beta` ï¿½ relative movement vs SPY benchmark
+- `volatility` ï¿½ annualised historical volatility
+- `spy_correlation` ï¿½ Pearson correlation of daily returns with SPY
+- `spy_trend` ï¿½ bullish / bearish / neutral based on SPY EMA 20/50 cross
+- `trend_direction` ï¿½ strong_uptrend / uptrend / mixed / downtrend / strong_downtrend
+- `sector` ï¿½ mapped from built-in sector lookup table
 
 ### scenario_engine.py
 Generates probabilistic scenarios over a configurable horizon:
@@ -381,8 +427,8 @@ Generates probabilistic scenarios over a configurable horizon:
 
 ### forecast_engine.py
 Orchestrates MarketContextEngine + ScenarioEngine into a complete forecast package, also producing:
-- `risk_factors` — list of plain-language risk warnings
-- `trend_summary` — one-line trend narrative
+- `risk_factors` ï¿½ list of plain-language risk warnings
+- `trend_summary` ï¿½ one-line trend narrative
 
 ### comparison_engine.py
 Scores two stocks across 8 weighted metrics and declares a winner:
@@ -398,7 +444,7 @@ Scores two stocks across 8 weighted metrics and declares a winner:
 | Trend score | 10% |
 | Risk factor count | 5% |
 
-Returns `winner`, `confidence` (0–100), `score_a`, `score_b`, `comparison_summary`, `key_factors`.
+Returns `winner`, `confidence` (0ï¿½100), `score_a`, `score_b`, `comparison_summary`, `key_factors`.
 
 ### ranking_engine.py
 Composite score formula for the daily scanner:
@@ -424,7 +470,7 @@ All settings live in `config/settings.py`:
 | `HISTORICAL_YEARS` | `5` | Years of OHLCV history to fetch |
 | `BENCHMARK_SYMBOL` | `"SPY"` | Benchmark for beta and correlation |
 | `TOP_N` | `10` | Number of top stocks to return |
-| `ML_ENABLED` | `False` | Toggle XGBoost ML layer |
+| `ML_ENABLED` | `True` | Enable XGBoost ML layer (falls back to rule-based if no model file exists) |
 | `ML_MODEL_PATH` | `"models/xgb_model.pkl"` | Path to trained model file |
 | `EMA_PERIODS` | `[20, 50, 200]` | EMA windows |
 | `RSI_PERIOD` | `14` | RSI lookback |
@@ -443,7 +489,7 @@ All settings live in `config/settings.py`:
 
 ## Output Formats
 
-### Daily Scanner — `output/results_YYYY-MM-DD.json`
+### Daily Scanner ï¿½ `output/results_YYYY-MM-DD.json`
 
 ```json
 {
@@ -464,7 +510,7 @@ All settings live in `config/settings.py`:
 }
 ```
 
-### Stock Comparison — `output/comparison_results_YYYY-MM-DD.json`
+### Stock Comparison ï¿½ `output/comparison_results_YYYY-MM-DD.json`
 
 ```json
 {
@@ -521,33 +567,63 @@ class MyStrategy(BaseStrategy):
 manager.register(MyStrategy(), weight=0.20)
 ```
 
-No other changes required — the engine discovers and applies it automatically.
+No other changes required ï¿½ the engine discovers and applies it automatically.
 
 ---
 
 ## Enabling ML Predictions
 
-The ML layer is disabled by default and falls back to a rule-based bias score.
+ML is **enabled by default** (`ML_ENABLED = True` in `config/settings.py`). When no trained model exists it automatically falls back to rule-based scoring â€” no crashes, no configuration needed.
 
-To enable XGBoost predictions:
+### Recommended: train via the UI
 
-1. Train a model with the required 13 feature columns:
-   `RSI, MACD, MACD_hist, ATR_pct, BB_pct, BB_width, Volume_ratio, Mom_5d, Mom_20d, Mom_60d, Volatility, Trend_strength, Beta`
+1. Run `streamlit run ui/app.py`
+2. Click the **ðŸ¤– ML Training** tab
+3. Confirm or edit the training symbols (defaults to `CUSTOM_SYMBOLS`)
+4. Set the label horizon (default 20 trading days â‰ˆ 1 month)
+5. Click **ðŸš€ Train Model**
+6. Watch the real-time progress bar; results and feature importances appear automatically
+7. The **Enable ML Predictions** toggle in the sidebar (already ON) activates the model immediately
 
-2. Save it:
+### UI toggle
+
+The **Enable ML Predictions** toggle at the top of the sidebar lets you switch between the trained model and rule-based scoring at any time without restarting the app. Changing the toggle busts the Streamlit comparison cache so results always match the selected mode.
+
+### Runtime override API
+
+You can also control the ML state programmatically:
+
+```python
+from engine.ml_engine import set_runtime_ml_enabled, _is_ml_enabled
+
+set_runtime_ml_enabled(True)   # activate XGBoost model
+set_runtime_ml_enabled(False)  # force rule-based
+print(_is_ml_enabled())        # check current effective state
+```
+
+### Training details
+
+| Item | Detail |
+|---|---|
+| Model | XGBoost `XGBClassifier` (falls back to sklearn `GradientBoostingClassifier` if XGBoost not installed) |
+| Task | Binary classification: price higher N days from now (1) or lower (0) |
+| Features | 13 columns: `RSI, MACD, MACD_hist, ATR_pct, BB_pct, BB_width, Volume_ratio, Mom_5d, Mom_20d, Mom_60d, Volatility, Trend_strength, Beta` |
+| Train/test split | 80 / 20, stratified |
+| Save path | `models/xgb_model.pkl` (joblib pickle) |
+| XGBoost params | 200 estimators Â· depth 4 Â· lr 0.05 Â· subsample 0.8 |
+
+### Manual training (advanced)
+
+If you prefer to train externally and plug in your own model:
 
 ```python
 import joblib
+
+# Your model must expose predict_proba(X) returning [p_down, p_up]
 joblib.dump(trained_model, "models/xgb_model.pkl")
 ```
 
-3. Enable it in `config/settings.py`:
-
-```python
-ML_ENABLED = True
-```
-
-The model must implement `predict_proba(X)` where column index `1` is the probability of an upward move. Output is scaled to [-1.0, +1.0].
+The prediction engine maps `predict_proba(X)[0][1]` â†’ `[-1.0, +1.0]` using `prob_up * 2 - 1`.
 
 ---
 

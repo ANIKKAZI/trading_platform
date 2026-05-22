@@ -40,7 +40,7 @@ STRATEGY_WEIGHTS = {
 
 # Ranking
 TOP_N = 10
-ML_ENABLED = False          # set True to enable XGBoost layer
+ML_ENABLED = True           # enable XGBoost layer when model exists (toggle in UI)
 ML_MODEL_PATH = "models/xgb_model.pkl"
 
 # Output

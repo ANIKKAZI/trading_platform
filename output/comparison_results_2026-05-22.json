@@ -2,26 +2,26 @@
   "date": "2026-05-22",
   "stock_a": "NVDA",
   "stock_b": "AAPL",
-  "horizon_months": 12,
+  "horizon_months": 5,
   "forecast": {
     "NVDA": {
-      "bull": "+90%",
-      "base": "+13%",
-      "bear": "-80%",
-      "bull_probability": 0.37,
-      "base_probability": 0.51,
-      "bear_probability": 0.12,
+      "bull": "+64%",
+      "base": "+3%",
+      "bear": "-58%",
+      "bull_probability": 0.35,
+      "base_probability": 0.52,
+      "bear_probability": 0.14,
       "bull_price_range": [
-        374.52,
-        474.67
+        333.97,
+        398.61
       ],
       "base_price_range": [
-        202.6,
-        302.75
+        198.21,
+        262.85
       ],
       "bear_price_range": [
-        0.01,
-        94.77
+        62.45,
+        127.1
       ],
       "current_price": 223.47,
       "trend_summary": "Strong uptrend  |  SPY: Bullish  |  Signal: NEUTRAL",
@@ -31,23 +31,23 @@
       ]
     },
     "AAPL": {
-      "bull": "+47%",
-      "base": "+6%",
-      "bear": "-34%",
-      "bull_probability": 0.38,
-      "base_probability": 0.51,
-      "bear_probability": 0.11,
+      "bull": "+26%",
+      "base": "+0%",
+      "bear": "-26%",
+      "bull_probability": 0.33,
+      "base_probability": 0.52,
+      "bear_probability": 0.15,
       "bull_price_range": [
-        414.73,
-        472.98
+        363.21,
+        400.81
       ],
       "base_price_range": [
-        292.4,
-        350.65
+        284.25,
+        321.85
       ],
       "bear_price_range": [
-        170.07,
-        228.32
+        205.28,
+        242.89
       ],
       "current_price": 302.25,
       "trend_summary": "Strong uptrend  |  SPY: Bullish  |  Signal: NEUTRAL",
@@ -57,17 +57,17 @@
     }
   },
   "winner": "NVDA",
-  "confidence": "75%",
+  "confidence": "80%",
   "key_factors": [
-    "Better base-case projected return (+13.1% vs +6.4%)"
+    "Better base-case projected return (+3.2% vs +0.3%)"
   ],
   "comparison_summary": [
-    "Expected Return (Base Case): NVDA wins (13.10 vs 6.40 \u2014 higher is better)",
-    "Upside Potential (Bull Case): NVDA wins (90.00 vs 46.90 \u2014 higher is better)",
-    "Downside Risk (Bear Case): NVDA wins (-80.00 vs -34.10 \u2014 lower is better)",
+    "Expected Return (Base Case): NVDA wins (3.20 vs 0.30 \u2014 higher is better)",
+    "Upside Potential (Bull Case): NVDA wins (63.90 vs 26.40 \u2014 higher is better)",
+    "Downside Risk (Bear Case): NVDA wins (-57.60 vs -25.90 \u2014 lower is better)",
     "Volatility: AAPL wins (0.19 vs 0.45 \u2014 lower is better)",
     "Strategy Alignment Score: NVDA wins (10.75 vs 8.75 \u2014 higher is better)",
-    "ML Prediction Confidence: AAPL wins (0.79 vs 0.72 \u2014 higher is better)",
+    "ML Prediction Confidence: NVDA wins (0.50 vs 0.42 \u2014 higher is better)",
     "Trend Score: Tied (5.00)",
     "Risk Factor Count: AAPL wins (1.00 vs 2.00 \u2014 lower is better)"
   ]

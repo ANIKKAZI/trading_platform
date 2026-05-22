@@ -22,14 +22,14 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import pandas as pd
 
-from config.settings import BENCHMARK_SYMBOL, ML_ENABLED, TOP_N
+from config.settings import BENCHMARK_SYMBOL, TOP_N
 from core.universe import load_universe
 from core.data_engine import fetch_universe
 from core.feature_engine import compute_features
 from core.sr_engine import compute_sr_zones
 from engine.strategy_manager import StrategyManager
 from engine.ranking_engine import rank_stocks
-from engine.ml_engine import MLPredictionEngine, predict_all
+from engine.ml_engine import MLPredictionEngine, predict_all, _is_ml_enabled
 from engine.insight_engine import generate_all_insights
 from engine.output_formatter import build_json_output, save_json_output
 from strategies.momentum_strategy import MomentumStrategy
@@ -116,7 +116,7 @@ def run(
 
     # --- 8. ML predictions (optional) ---
     ml_predictions = None
-    if ML_ENABLED:
+    if _is_ml_enabled():
         ml_engine = MLPredictionEngine()
         enriched_map = {s: p["data"] for s, p in symbol_results.items()}
         ml_predictions = predict_all(ml_engine, enriched_map)

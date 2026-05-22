@@ -27,7 +27,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import pandas as pd
 
-from config.settings import BENCHMARK_SYMBOL, ML_ENABLED
+from config.settings import BENCHMARK_SYMBOL
 from core.data_engine import fetch_symbol
 from core.feature_engine import compute_features
 from core.sr_engine import compute_sr_zones

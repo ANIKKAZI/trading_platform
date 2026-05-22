@@ -23,7 +23,11 @@ import plotly.graph_objects as go
 import streamlit as st
 import yfinance as yf
 
+import engine.ml_engine as _ml_engine_mod
+from config.settings import CUSTOM_SYMBOLS
 from core.data_engine import fetch_symbol
+from datetime import datetime as _dt
+from engine.ml_engine import MLTrainer
 from interfaces.compare_interface import CompareInterface
 from orchestrator import run as run_pipeline
 
@@ -141,7 +145,9 @@ _PLOTLY_BASE: dict = {
 
 
 @st.cache_data(show_spinner=False, ttl=3_600)
-def _run_comparison(symbol_a: str, symbol_b: str, horizon: int, force_refresh: bool) -> dict:
+def _run_comparison(symbol_a: str, symbol_b: str, horizon: int, force_refresh: bool, ml_enabled: bool) -> dict:
+    # ml_enabled is used as a cache-key discriminator; the runtime flag is set
+    # by the sidebar toggle before this function is called.
     iface = CompareInterface(force_refresh=force_refresh)
     return iface.run(
         symbol_a=symbol_a,
@@ -768,6 +774,7 @@ def _render_compare_tab(
     sensitivity: str,
     force_refresh_cmp: bool,
     run_compare: bool,
+    ml_enabled: bool = True,
 ) -> None:
     """Renders the Stock Comparison tab content."""
     st.subheader("🔀 Stock Comparison Forecast Dashboard")
@@ -785,7 +792,7 @@ def _render_compare_tab(
             return
         with st.spinner(f"Running pipeline: {sym_a} vs {sym_b}…"):
             try:
-                result = _run_comparison(sym_a, sym_b, horizon, force_refresh_cmp)
+                result = _run_comparison(sym_a, sym_b, horizon, force_refresh_cmp, ml_enabled)
                 st.session_state.update(
                     cmp_result=result,
                     cmp_result_sym_a=sym_a,
@@ -903,16 +910,255 @@ def _render_compare_tab(
 
 
 # ---------------------------------------------------------------------------
+# ML Training tab
+# ---------------------------------------------------------------------------
+
+
+def _render_ml_tab(model_path: str) -> None:
+    """Renders the ML Training tab."""
+    st.subheader("🤖 ML Model Training")
+    st.caption(
+        "Train an XGBoost binary classifier on historical feature data. "
+        "The trained model improves signal quality across both the scanner and comparison dashboard."
+    )
+
+    # ── Model status ──────────────────────────────────────────────────────────
+    model_exists = os.path.exists(model_path)
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Model Status", "✅ Trained" if model_exists else "❌ Not Trained")
+    if model_exists:
+        mtime = os.path.getmtime(model_path)
+        c2.metric("Last Trained", _dt.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M"))
+        c3.metric("Model Size", f"{os.path.getsize(model_path) / 1024:.1f} KB")
+    else:
+        c2.metric("Last Trained", "—")
+        c3.metric("Model Size", "—")
+
+    st.markdown("---")
+
+    # ── Configuration ─────────────────────────────────────────────────────────
+    col_cfg, col_info = st.columns([1, 1])
+
+    with col_cfg:
+        st.subheader("📋 Training Configuration")
+        symbols_input = st.text_area(
+            "Training Symbols  (comma-separated)",
+            value=", ".join(CUSTOM_SYMBOLS),
+            height=100,
+            key="ml_symbols",
+            help="Enter tickers to learn from. More symbols = more diverse training data.",
+        )
+        label_horizon = st.slider(
+            "Label Horizon  (trading days ahead)",
+            min_value=5, max_value=60, value=20, step=5,
+            key="ml_label_horizon",
+            help="How many days ahead to check for the up/down label. 20d ≈ 1 month.",
+        )
+        force_refresh_ml = st.checkbox(
+            "Force Data Refresh", value=False, key="ml_refresh",
+            help="Re-download price data even if cached.",
+        )
+
+    with col_info:
+        st.subheader("ℹ️ How Training Works")
+        st.info(
+            "**Steps:**\n\n"
+            "1. Fetches OHLCV data for each symbol\n"
+            "2. Computes 13 technical features per bar\n"
+            "3. Labels each bar: **1** if price is higher N days later, **0** if lower\n"
+            "4. Trains XGBoost binary classifier (sklearn fallback if XGBoost not installed)\n"
+            "5. Saves model to `models/xgb_model.pkl`\n\n"
+            "**Features used:**\n"
+            "RSI · MACD · MACD hist · ATR% · BB% · BB width · Volume ratio · "
+            "Mom 5/20/60d · Volatility · Trend strength · Beta"
+        )
+        st.markdown("**Accuracy guide:**")
+        st.markdown(
+            "- **> 60%** — strong predictive edge ✅\n"
+            "- **55–60%** — modest edge, useful ⚠️\n"
+            "- **< 55%** — near random, add more symbols"
+        )
+
+    train_btn = st.button(
+        "🚀 Train Model", type="primary", use_container_width=True, key="ml_train_btn"
+    )
+
+    if train_btn:
+        symbols_raw = [s.strip().upper() for s in symbols_input.split(",") if s.strip()]
+        if not symbols_raw:
+            st.error("Please enter at least one symbol.")
+            return
+
+        st.markdown("---")
+        progress_bar = st.progress(0.0)
+        status_text = st.empty()
+
+        def _progress_cb(pct: float, msg: str) -> None:
+            progress_bar.progress(min(float(pct), 1.0))
+            status_text.text(msg)
+
+        try:
+            from config.settings import BENCHMARK_SYMBOL
+            from core.data_engine import fetch_symbol as _fetch
+            from core.feature_engine import compute_features as _features
+
+            _progress_cb(0.02, f"Fetching data for {len(symbols_raw)} symbols…")
+            bench_df = None
+            try:
+                bench_df = _fetch(BENCHMARK_SYMBOL, force_refresh=force_refresh_ml)
+            except Exception:
+                pass
+
+            feature_data: dict[str, pd.DataFrame] = {}
+            for i, sym in enumerate(symbols_raw):
+                _progress_cb(
+                    0.02 + 0.18 * (i / len(symbols_raw)),
+                    f"Computing features for {sym}  ({i + 1}/{len(symbols_raw)})…",
+                )
+                try:
+                    raw = _fetch(sym, force_refresh=force_refresh_ml)
+                    enriched = _features(raw, benchmark=bench_df)
+                    if len(enriched) >= 100:
+                        feature_data[sym] = enriched
+                    else:
+                        st.warning(f"Skipped {sym}: only {len(enriched)} rows (need ≥100).")
+                except Exception as e:
+                    st.warning(f"Skipped {sym}: {e}")
+
+            if not feature_data:
+                st.error("No valid data to train on. Check symbols or enable Force Data Refresh.")
+                return
+
+            trainer = MLTrainer()
+            train_result = trainer.train(
+                symbol_data=feature_data,
+                label_horizon=label_horizon,
+                progress_callback=_progress_cb,
+                model_path=model_path,
+            )
+
+            progress_bar.empty()
+            status_text.empty()
+
+            if "error" in train_result:
+                st.error(train_result["error"])
+                return
+
+            st.session_state["ml_train_result"] = train_result
+            # Force-reload the model in the prediction engine after training
+            _ml_engine_mod._runtime_ml_enabled = True
+
+        except Exception as exc:
+            progress_bar.empty()
+            status_text.empty()
+            st.error(f"Training failed: {exc}")
+            st.exception(exc)
+
+    # ── Training results ──────────────────────────────────────────────────────
+    if "ml_train_result" in st.session_state:
+        res = st.session_state["ml_train_result"]
+        st.markdown("---")
+        st.subheader("📊 Training Results")
+
+        m1, m2, m3, m4, m5 = st.columns(5)
+        m1.metric("Model", res.get("model_type", "—"))
+        m2.metric("Accuracy", f"{res['accuracy'] * 100:.1f}%")
+        m3.metric("Train Samples", f"{res['n_train']:,}")
+        m4.metric("Test Samples", f"{res['n_test']:,}")
+        m5.metric("Symbols Used", str(res.get("n_symbols", "—")))
+
+        acc = res["accuracy"]
+        if acc >= 0.60:
+            st.success(f"✅ Model trained successfully! Accuracy {acc * 100:.1f}% — good predictive power.")
+        elif acc >= 0.52:
+            st.warning(f"⚠️ Model trained. Accuracy {acc * 100:.1f}% — modest edge. Consider adding more symbols.")
+        else:
+            st.error(
+                f"❌ Accuracy {acc * 100:.1f}% is near random. "
+                "Add more symbols, try a different horizon, or ensure data quality."
+            )
+
+        st.caption(f"Label horizon: {res['label_horizon_days']}d · "
+                   f"Total samples: {res['n_samples']:,} · Model saved → {res['model_path']}")
+
+        importances = res.get("feature_importances", {})
+        if importances:
+            st.subheader("🔬 Feature Importances")
+            feat_df = pd.DataFrame(
+                sorted(importances.items(), key=lambda x: x[1], reverse=True),
+                columns=["Feature", "Importance"],
+            )
+            fig_imp = go.Figure(go.Bar(
+                x=feat_df["Importance"],
+                y=feat_df["Feature"],
+                orientation="h",
+                marker=dict(
+                    color=feat_df["Importance"].tolist(),
+                    colorscale="Blues",
+                    showscale=False,
+                ),
+                text=[f"{v:.4f}" for v in feat_df["Importance"]],
+                textposition="outside",
+            ))
+            fig_imp.update_layout(
+                **{**_PLOTLY_BASE, "margin": dict(l=140, r=80, t=44, b=44)},
+                title="Feature Importance  (higher = more influential in predictions)",
+                xaxis_title="Importance Score",
+                yaxis=dict(autorange="reversed"),
+                height=460,
+            )
+            st.plotly_chart(fig_imp, use_container_width=True)
+
+        st.info(
+            "💡 **Tip:** After training, toggle **Enable ML Predictions** ON in the sidebar "
+            "(it should already be ON) and use **Force Data Refresh** when re-running the "
+            "scanner or comparison to pick up the new model."
+        )
+
+
+# ---------------------------------------------------------------------------
 # Main — unified entry point
 # ---------------------------------------------------------------------------
 
 
 def main() -> None:
     # Top-level page tabs
-    tab_scan, tab_compare = st.tabs(["📊 Daily Scanner", "🔀 Stock Comparison"])
+    tab_scan, tab_compare, tab_ml = st.tabs(
+        ["📊 Daily Scanner", "🔀 Stock Comparison", "🤖 ML Training"]
+    )
 
     # ── Shared sidebar ─────────────────────────────────────────────────────────
     with st.sidebar:
+        # ── ML Settings (global toggle) ───────────────────────────────────────
+        st.markdown('<div class="sidebar-section-header">🤖 ML Settings</div>', unsafe_allow_html=True)
+
+        _model_path_abs = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "models", "xgb_model.pkl",
+        )
+        _model_exists = os.path.exists(_model_path_abs)
+
+        ml_enabled = st.toggle(
+            "Enable ML Predictions",
+            value=True,
+            key="ml_enabled_toggle",
+            help=(
+                "**ON** → uses the trained XGBoost model (if it exists), "
+                "otherwise falls back to rule-based scoring.\n\n"
+                "**OFF** → always uses rule-based scoring regardless of trained model."
+            ),
+        )
+        _ml_engine_mod.set_runtime_ml_enabled(ml_enabled)
+
+        if ml_enabled and _model_exists:
+            st.caption("✅ ML model active")
+        elif ml_enabled:
+            st.caption("⚠️ No model yet — train one in the **ML Training** tab")
+        else:
+            st.caption("ℹ️ Rule-based scoring active")
+
+        st.markdown("---")
+
         # ── Scanner section ───────────────────────────────────────────────────
         st.markdown('<div class="sidebar-section-header">📊 Scanner Settings</div>', unsafe_allow_html=True)
 
@@ -977,7 +1223,11 @@ def main() -> None:
         _render_compare_tab(
             sym_a, sym_b, horizon_label, horizon, sensitivity,
             force_refresh_cmp, run_compare_btn,
+            ml_enabled=ml_enabled,
         )
+
+    with tab_ml:
+        _render_ml_tab(_model_path_abs)
 
 
 if __name__ == "__main__":
