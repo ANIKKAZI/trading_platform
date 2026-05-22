@@ -1,0 +1,75 @@
+{
+  "date": "2026-05-22",
+  "stock_a": "TSLA",
+  "stock_b": "AAPL",
+  "horizon_months": 12,
+  "forecast": {
+    "TSLA": {
+      "bull": "+90%",
+      "base": "+11%",
+      "bear": "-76%",
+      "bull_probability": 0.37,
+      "base_probability": 0.51,
+      "bear_probability": 0.12,
+      "bull_price_range": [
+        706.32,
+        879.27
+      ],
+      "base_price_range": [
+        374.85,
+        547.81
+      ],
+      "bear_price_range": [
+        11.65,
+        184.61
+      ],
+      "current_price": 417.26,
+      "trend_summary": "Strong uptrend  |  SPY: Bullish  |  Signal: BUY",
+      "risk_factors": [
+        "Elevated volatility (41%) \u2014 increased forecast uncertainty",
+        "High beta (1.78) \u2014 amplified sensitivity to broad-market moves"
+      ]
+    },
+    "AAPL": {
+      "bull": "+47%",
+      "base": "+6%",
+      "bear": "-34%",
+      "bull_probability": 0.38,
+      "base_probability": 0.51,
+      "bear_probability": 0.11,
+      "bull_price_range": [
+        414.73,
+        472.98
+      ],
+      "base_price_range": [
+        292.4,
+        350.65
+      ],
+      "bear_price_range": [
+        170.07,
+        228.32
+      ],
+      "current_price": 302.25,
+      "trend_summary": "Strong uptrend  |  SPY: Bullish  |  Signal: NEUTRAL",
+      "risk_factors": [
+        "RSI overbought (75) \u2014 elevated pullback risk"
+      ]
+    }
+  },
+  "winner": "TSLA",
+  "confidence": "70%",
+  "key_factors": [
+    "Higher strategy aggregate score (27.0 vs 8.7)",
+    "Better base-case projected return (+10.6% vs +6.4%)"
+  ],
+  "comparison_summary": [
+    "Expected Return (Base Case): TSLA wins (10.60 vs 6.40 \u2014 higher is better)",
+    "Upside Potential (Bull Case): TSLA wins (90.00 vs 46.90 \u2014 higher is better)",
+    "Downside Risk (Bear Case): TSLA wins (-76.50 vs -34.10 \u2014 lower is better)",
+    "Volatility: AAPL wins (0.19 vs 0.41 \u2014 lower is better)",
+    "Strategy Alignment Score: TSLA wins (27.00 vs 8.75 \u2014 higher is better)",
+    "ML Prediction Confidence: AAPL wins (0.79 vs 0.49 \u2014 higher is better)",
+    "Trend Score: AAPL wins (5.00 vs 4.00 \u2014 higher is better)",
+    "Risk Factor Count: AAPL wins (1.00 vs 2.00 \u2014 lower is better)"
+  ]
+}

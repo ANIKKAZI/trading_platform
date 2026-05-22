@@ -2,62 +2,6 @@
   "date": "2026-05-21",
   "top_10_stocks": [
     {
-      "symbol": "V",
-      "score": 52.92,
-      "signal": "NEUTRAL",
-      "support": [
-        323.29,
-        326.12
-      ],
-      "resistance": [
-        331.44,
-        336.2
-      ],
-      "strategies_triggered": [
-        "MomentumStrategy",
-        "MeanReversionStrategy"
-      ],
-      "prediction": null,
-      "strategy_score": 10.75,
-      "momentum_score": 100.0
-    },
-    {
-      "symbol": "AMZN",
-      "score": 51.39,
-      "signal": "BUY",
-      "support": [
-        247.78,
-        248.94
-      ],
-      "resistance": [],
-      "strategies_triggered": [
-        "MomentumStrategy",
-        "VolatilityStrategy"
-      ],
-      "prediction": null,
-      "strategy_score": 35.07,
-      "momentum_score": 80.0
-    },
-    {
-      "symbol": "UNH",
-      "score": 51.38,
-      "signal": "BUY",
-      "support": [
-        370.82,
-        375.54
-      ],
-      "resistance": [
-        389.25,
-        391.42
-      ],
-      "strategies_triggered": [
-        "MomentumStrategy"
-      ],
-      "prediction": null,
-      "strategy_score": 27.0,
-      "momentum_score": 80.0
-    },
-    {
       "symbol": "AAPL",
       "score": 50.47,
       "signal": "NEUTRAL",
@@ -73,22 +17,6 @@
       "prediction": null,
       "strategy_score": 8.75,
       "momentum_score": 100.0
-    },
-    {
-      "symbol": "GOOGL",
-      "score": 48.58,
-      "signal": "BUY",
-      "support": [
-        294.08,
-        296.04
-      ],
-      "resistance": [],
-      "strategies_triggered": [
-        "MomentumStrategy"
-      ],
-      "prediction": null,
-      "strategy_score": 27.0,
-      "momentum_score": 80.0
     },
     {
       "symbol": "TSLA",
@@ -145,43 +73,6 @@
       "prediction": null,
       "strategy_score": -1.76,
       "momentum_score": 70.0
-    },
-    {
-      "symbol": "JPM",
-      "score": 36.9,
-      "signal": "NEUTRAL",
-      "support": [
-        295.0,
-        296.97
-      ],
-      "resistance": [
-        313.45,
-        319.17
-      ],
-      "strategies_triggered": [],
-      "prediction": null,
-      "strategy_score": 0.0,
-      "momentum_score": 50.0
-    },
-    {
-      "symbol": "META",
-      "score": 22.28,
-      "signal": "NEUTRAL",
-      "support": [
-        598.31,
-        600.06
-      ],
-      "resistance": [
-        627.61,
-        635.34
-      ],
-      "strategies_triggered": [
-        "MomentumStrategy",
-        "MeanReversionStrategy"
-      ],
-      "prediction": null,
-      "strategy_score": -5.0,
-      "momentum_score": 0.0
     }
   ]
 }

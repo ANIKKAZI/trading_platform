@@ -89,6 +89,99 @@
       "prediction": null,
       "strategy_score": 27.0,
       "momentum_score": 80.0
+    },
+    {
+      "symbol": "TSLA",
+      "score": 48.58,
+      "signal": "BUY",
+      "support": [
+        409.28,
+        414.5
+      ],
+      "resistance": [
+        470.75,
+        474.07
+      ],
+      "strategies_triggered": [
+        "MomentumStrategy"
+      ],
+      "prediction": null,
+      "strategy_score": 27.0,
+      "momentum_score": 80.0
+    },
+    {
+      "symbol": "NVDA",
+      "score": 44.92,
+      "signal": "NEUTRAL",
+      "support": [
+        193.62,
+        195.6
+      ],
+      "resistance": [],
+      "strategies_triggered": [
+        "MomentumStrategy",
+        "MeanReversionStrategy"
+      ],
+      "prediction": null,
+      "strategy_score": 10.75,
+      "momentum_score": 80.0
+    },
+    {
+      "symbol": "MSFT",
+      "score": 43.6,
+      "signal": "NEUTRAL",
+      "support": [
+        413.05,
+        416.12
+      ],
+      "resistance": [
+        421.86,
+        427.82
+      ],
+      "strategies_triggered": [
+        "MeanReversionStrategy",
+        "VolatilityStrategy"
+      ],
+      "prediction": null,
+      "strategy_score": -1.76,
+      "momentum_score": 70.0
+    },
+    {
+      "symbol": "JPM",
+      "score": 36.9,
+      "signal": "NEUTRAL",
+      "support": [
+        295.0,
+        296.97
+      ],
+      "resistance": [
+        313.45,
+        319.17
+      ],
+      "strategies_triggered": [],
+      "prediction": null,
+      "strategy_score": 0.0,
+      "momentum_score": 50.0
+    },
+    {
+      "symbol": "META",
+      "score": 22.28,
+      "signal": "NEUTRAL",
+      "support": [
+        598.31,
+        600.06
+      ],
+      "resistance": [
+        627.61,
+        635.34
+      ],
+      "strategies_triggered": [
+        "MomentumStrategy",
+        "MeanReversionStrategy"
+      ],
+      "prediction": null,
+      "strategy_score": -5.0,
+      "momentum_score": 0.0
     }
   ]
 }

@@ -82,3 +82,120 @@ def generate_all_insights(ranked_stocks: list[dict], ml_predictions: dict | None
         ml = ml_predictions.get(sym) if ml_predictions else None
         insights.append(generate_insight(sym, entry, ml_score=ml))
     return insights
+
+
+# ---------------------------------------------------------------------------
+# Comparison-specific insight generator (added for compare_interface)
+# ---------------------------------------------------------------------------
+
+def generate_comparison_insight(
+    symbol: str,
+    payload: dict,
+    forecast: dict,
+    comparison_result: dict,
+) -> str:
+    """
+    Generate a human-readable comparison insight for one stock.
+
+    Parameters
+    ----------
+    symbol              : ticker string
+    payload             : comparison payload dict (includes latest_row, strategy_output, etc.)
+    forecast            : forecast dict from ForecastEngine.forecast()
+    comparison_result   : dict returned by ComparisonEngine.compare()
+
+    Returns
+    -------
+    Multi-line string suitable for CLI display.
+    """
+    row: pd.Series = payload.get("latest_row")
+    strategy_output: dict = payload.get("strategy_output", {})
+    ml_output: float = float(payload.get("ml_output", 0.0))
+    sr_zones = payload.get("sr_zones")
+    scenarios: dict = forecast.get("scenarios", {})
+    risk_factors: list[str] = forecast.get("risk_factors", [])
+    context: dict = forecast.get("market_context", {})
+    winner: str = comparison_result.get("winner", "")
+    is_winner = winner == symbol
+
+    lines: list[str] = [
+        f"{'─' * 50}",
+        f"  {symbol}{'  ← WINNER' if is_winner else ''}",
+        f"  Current Price: ${forecast.get('current_price', 0):.2f}",
+        f"{'─' * 50}",
+    ]
+
+    # Strategy signals
+    raw_signals: dict = strategy_output.get("raw_signals", {})
+    confidences: dict = strategy_output.get("confidences", {})
+    triggered: list[str] = strategy_output.get("triggered", [])
+
+    lines.append("Strategy Signals:")
+    for name, sig in raw_signals.items():
+        direction = "Bullish" if sig == 1 else ("Bearish" if sig == -1 else "Neutral")
+        conf = confidences.get(name, 0.5)
+        lines.append(f"  {name:<28} {direction:<10}  (conf: {conf:.0%})")
+
+    # 5-month scenarios
+    lines.append(f"\n{forecast.get('horizon_months', 5)}-Month Forecast Scenarios:")
+    for case_key, label in [
+        ("bull_case", "Bull"), ("base_case", "Base"), ("bear_case", "Bear")
+    ]:
+        sc = scenarios.get(case_key, {})
+        move = sc.get("expected_move", "N/A")
+        prob = sc.get("probability", 0.0)
+        pr = sc.get("price_range", [])
+        pr_str = f"  ${pr[0]:.2f}–${pr[1]:.2f}" if len(pr) == 2 else ""
+        lines.append(f"  {label:<6}: {move:<8}  (p={prob:.0%}){pr_str}")
+
+    # Key technicals
+    if row is not None:
+        lines.append("\nKey Technicals:")
+        lines.append(f"  Close:     ${float(row.get('Close', 0)):.2f}")
+        lines.append(f"  RSI:       {float(row.get('RSI', float('nan'))):.1f}")
+        lines.append(
+            f"  EMA20: {float(row.get('EMA_20', float('nan'))):.2f}  "
+            f"EMA50: {float(row.get('EMA_50', float('nan'))):.2f}  "
+            f"EMA200: {float(row.get('EMA_200', float('nan'))):.2f}"
+        )
+        lines.append(f"  MACD hist: {float(row.get('MACD_hist', float('nan'))):.3f}")
+        lines.append(f"  ATR%:      {float(row.get('ATR_pct', float('nan'))):.2%}")
+        lines.append(
+            f"  5D Mom: {float(row.get('Mom_5d', float('nan'))):.2%}  "
+            f"20D: {float(row.get('Mom_20d', float('nan'))):.2%}  "
+            f"60D: {float(row.get('Mom_60d', float('nan'))):.2%}"
+        )
+        lines.append(
+            f"  Beta: {float(context.get('beta', float('nan'))):.2f}  "
+            f"Corr(SPY): {float(context.get('spy_correlation', float('nan'))):.2f}  "
+            f"Ann.Vol: {float(context.get('volatility', float('nan'))):.1%}"
+        )
+
+    # S/R zones
+    if sr_zones is not None:
+        if sr_zones.resistance:
+            lo, hi = sr_zones.resistance[0]
+            lines.append(f"\n  Nearest Resistance: {lo:.2f}–{hi:.2f}")
+        if sr_zones.support:
+            lo, hi = sr_zones.support[0]
+            lines.append(f"  Nearest Support:    {lo:.2f}–{hi:.2f}")
+
+    # ML prediction
+    ml_pct = ml_output * 3
+    direction_str = "positive" if ml_pct >= 0 else "negative"
+    lines.append(f"\n  ML Prediction bias: {ml_pct:+.1f}% ({direction_str})")
+
+    # Risk factors
+    lines.append("\nRisk Factors:")
+    for r in risk_factors:
+        lines.append(f"  ⚠  {r}")
+
+    # Winner key factors (only shown for the winning stock)
+    if is_winner:
+        key_factors: list[str] = comparison_result.get("key_factors", [])
+        if key_factors:
+            lines.append("\nWhy this stock ranked stronger:")
+            for f in key_factors:
+                lines.append(f"  ✓  {f}")
+
+    return "\n".join(lines)
