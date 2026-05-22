@@ -1,74 +1,75 @@
 {
   "date": "2026-05-22",
-  "stock_a": "NVDA",
+  "stock_a": "GOOGL",
   "stock_b": "AAPL",
   "horizon_months": 5,
   "forecast": {
-    "NVDA": {
-      "bull": "+64%",
-      "base": "+3%",
-      "bear": "-58%",
-      "bull_probability": 0.35,
-      "base_probability": 0.52,
-      "bear_probability": 0.14,
+    "GOOGL": {
+      "bull": "+66%",
+      "base": "+9%",
+      "bear": "-49%",
+      "bull_probability": 0.38,
+      "base_probability": 0.51,
+      "bear_probability": 0.12,
       "bull_price_range": [
-        333.97,
-        398.61
+        591.18,
+        697.3
       ],
       "base_price_range": [
-        198.21,
-        262.85
+        368.32,
+        474.44
       ],
       "bear_price_range": [
-        62.45,
-        127.1
+        145.47,
+        251.59
       ],
-      "current_price": 223.47,
-      "trend_summary": "Strong uptrend  |  SPY: Bullish  |  Signal: NEUTRAL",
+      "current_price": 387.66,
+      "trend_summary": "Strong uptrend  |  SPY: Bullish  |  Signal: BUY",
       "risk_factors": [
-        "Elevated volatility (45%) \u2014 increased forecast uncertainty",
-        "High beta (1.79) \u2014 amplified sensitivity to broad-market moves"
+        "Elevated volatility (42%) \u2014 increased forecast uncertainty",
+        "High beta (1.65) \u2014 amplified sensitivity to broad-market moves"
       ]
     },
     "AAPL": {
-      "bull": "+26%",
-      "base": "+0%",
-      "bear": "-26%",
-      "bull_probability": 0.33,
-      "base_probability": 0.52,
-      "bear_probability": 0.15,
+      "bull": "+30%",
+      "base": "+4%",
+      "bear": "-22%",
+      "bull_probability": 0.37,
+      "base_probability": 0.51,
+      "bear_probability": 0.12,
       "bull_price_range": [
-        363.21,
-        400.81
+        376.74,
+        414.64
       ],
       "base_price_range": [
-        284.25,
-        321.85
+        297.15,
+        335.05
       ],
       "bear_price_range": [
-        205.28,
-        242.89
+        217.56,
+        255.46
       ],
-      "current_price": 302.25,
+      "current_price": 304.99,
       "trend_summary": "Strong uptrend  |  SPY: Bullish  |  Signal: NEUTRAL",
       "risk_factors": [
-        "RSI overbought (75) \u2014 elevated pullback risk"
+        "RSI overbought (76) \u2014 elevated pullback risk"
       ]
     }
   },
-  "winner": "NVDA",
-  "confidence": "80%",
+  "winner": "GOOGL",
+  "confidence": "70%",
   "key_factors": [
-    "Better base-case projected return (+3.2% vs +0.3%)"
+    "Higher strategy aggregate score (27.0 vs 8.7)",
+    "Better base-case projected return (+8.7% vs +3.6%)"
   ],
   "comparison_summary": [
-    "Expected Return (Base Case): NVDA wins (3.20 vs 0.30 \u2014 higher is better)",
-    "Upside Potential (Bull Case): NVDA wins (63.90 vs 26.40 \u2014 higher is better)",
-    "Downside Risk (Bear Case): NVDA wins (-57.60 vs -25.90 \u2014 lower is better)",
-    "Volatility: AAPL wins (0.19 vs 0.45 \u2014 lower is better)",
-    "Strategy Alignment Score: NVDA wins (10.75 vs 8.75 \u2014 higher is better)",
-    "ML Prediction Confidence: NVDA wins (0.50 vs 0.42 \u2014 higher is better)",
-    "Trend Score: Tied (5.00)",
+    "Expected Return (Base Case): GOOGL wins (8.70 vs 3.60 \u2014 higher is better)",
+    "Upside Potential (Bull Case): GOOGL wins (66.20 vs 29.70 \u2014 higher is better)",
+    "Downside Risk (Bear Case): GOOGL wins (-48.80 vs -22.50 \u2014 lower is better)",
+    "Volatility: AAPL wins (0.19 vs 0.42 \u2014 lower is better)",
+    "Strategy Alignment Score: GOOGL wins (27.00 vs 8.75 \u2014 higher is better)",
+    "ML Prediction Confidence: AAPL wins (0.75 vs 0.56 \u2014 higher is better)",
+    "Trend Score: AAPL wins (5.00 vs 4.00 \u2014 higher is better)",
     "Risk Factor Count: AAPL wins (1.00 vs 2.00 \u2014 lower is better)"
   ]
 }

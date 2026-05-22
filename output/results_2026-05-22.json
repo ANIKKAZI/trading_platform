@@ -2,8 +2,45 @@
   "date": "2026-05-22",
   "top_10_stocks": [
     {
+      "symbol": "MSFT",
+      "score": 59.41,
+      "signal": "BUY",
+      "support": [
+        412.16,
+        415.22
+      ],
+      "resistance": [
+        420.94,
+        426.89
+      ],
+      "strategies_triggered": [
+        "MomentumStrategy",
+        "VolatilityStrategy"
+      ],
+      "prediction": "-0.0%",
+      "strategy_score": 35.2,
+      "momentum_score": 100.0
+    },
+    {
+      "symbol": "AMZN",
+      "score": 57.22,
+      "signal": "BUY",
+      "support": [
+        247.78,
+        248.94
+      ],
+      "resistance": [],
+      "strategies_triggered": [
+        "MomentumStrategy",
+        "VolatilityStrategy"
+      ],
+      "prediction": "+0.5%",
+      "strategy_score": 38.0,
+      "momentum_score": 100.0
+    },
+    {
       "symbol": "V",
-      "score": 52.92,
+      "score": 52.79,
       "signal": "NEUTRAL",
       "support": [
         323.29,
@@ -17,30 +54,13 @@
         "MomentumStrategy",
         "MeanReversionStrategy"
       ],
-      "prediction": null,
+      "prediction": "-0.4%",
       "strategy_score": 10.75,
       "momentum_score": 100.0
     },
     {
-      "symbol": "AMZN",
-      "score": 51.39,
-      "signal": "BUY",
-      "support": [
-        247.78,
-        248.94
-      ],
-      "resistance": [],
-      "strategies_triggered": [
-        "MomentumStrategy",
-        "VolatilityStrategy"
-      ],
-      "prediction": null,
-      "strategy_score": 35.07,
-      "momentum_score": 80.0
-    },
-    {
       "symbol": "UNH",
-      "score": 51.38,
+      "score": 51.51,
       "signal": "BUY",
       "support": [
         370.82,
@@ -53,13 +73,13 @@
       "strategies_triggered": [
         "MomentumStrategy"
       ],
-      "prediction": null,
+      "prediction": "+0.4%",
       "strategy_score": 27.0,
       "momentum_score": 80.0
     },
     {
       "symbol": "AAPL",
-      "score": 50.47,
+      "score": 50.3,
       "signal": "NEUTRAL",
       "support": [
         276.54,
@@ -70,13 +90,13 @@
         "MomentumStrategy",
         "MeanReversionStrategy"
       ],
-      "prediction": null,
+      "prediction": "-0.5%",
       "strategy_score": 8.75,
       "momentum_score": 100.0
     },
     {
       "symbol": "GOOGL",
-      "score": 48.58,
+      "score": 48.98,
       "signal": "BUY",
       "support": [
         294.08,
@@ -86,13 +106,29 @@
       "strategies_triggered": [
         "MomentumStrategy"
       ],
-      "prediction": null,
+      "prediction": "+1.2%",
+      "strategy_score": 27.0,
+      "momentum_score": 80.0
+    },
+    {
+      "symbol": "NVDA",
+      "score": 48.48,
+      "signal": "BUY",
+      "support": [
+        193.62,
+        195.6
+      ],
+      "resistance": [],
+      "strategies_triggered": [
+        "MomentumStrategy"
+      ],
+      "prediction": "-0.3%",
       "strategy_score": 27.0,
       "momentum_score": 80.0
     },
     {
       "symbol": "TSLA",
-      "score": 48.58,
+      "score": 48.36,
       "signal": "BUY",
       "support": [
         409.28,
@@ -105,50 +141,13 @@
       "strategies_triggered": [
         "MomentumStrategy"
       ],
-      "prediction": null,
+      "prediction": "-0.6%",
       "strategy_score": 27.0,
       "momentum_score": 80.0
     },
     {
-      "symbol": "NVDA",
-      "score": 44.92,
-      "signal": "NEUTRAL",
-      "support": [
-        193.62,
-        195.6
-      ],
-      "resistance": [],
-      "strategies_triggered": [
-        "MomentumStrategy",
-        "MeanReversionStrategy"
-      ],
-      "prediction": null,
-      "strategy_score": 10.75,
-      "momentum_score": 80.0
-    },
-    {
-      "symbol": "MSFT",
-      "score": 43.6,
-      "signal": "NEUTRAL",
-      "support": [
-        413.05,
-        416.12
-      ],
-      "resistance": [
-        421.86,
-        427.82
-      ],
-      "strategies_triggered": [
-        "MeanReversionStrategy",
-        "VolatilityStrategy"
-      ],
-      "prediction": null,
-      "strategy_score": -1.76,
-      "momentum_score": 70.0
-    },
-    {
       "symbol": "JPM",
-      "score": 36.9,
+      "score": 37.14,
       "signal": "NEUTRAL",
       "support": [
         295.0,
@@ -159,13 +158,13 @@
         319.17
       ],
       "strategies_triggered": [],
-      "prediction": null,
+      "prediction": "+0.7%",
       "strategy_score": 0.0,
       "momentum_score": 50.0
     },
     {
       "symbol": "META",
-      "score": 22.28,
+      "score": 20.2,
       "signal": "NEUTRAL",
       "support": [
         598.31,
@@ -176,11 +175,10 @@
         635.34
       ],
       "strategies_triggered": [
-        "MomentumStrategy",
-        "MeanReversionStrategy"
+        "MomentumStrategy"
       ],
-      "prediction": null,
-      "strategy_score": -5.0,
+      "prediction": "+0.5%",
+      "strategy_score": -15.0,
       "momentum_score": 0.0
     }
   ]
